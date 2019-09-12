@@ -14,13 +14,27 @@ export default class IndecisionApp extends React.Component {
   }
   
   handleDeleteOptions = () => {
-    this.setState(() => ({ options: [] }));
+    fetch('http://todosapi:8080/todos', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    }).then(res => res.json())
+    .then((options) => {
+      this.setState({ options: options.map(o => o.option) })
+    })
   }
 
   handleDeleteOption = (optionToRemove) => {
-    this.setState((prevState) => ({
-      options: prevState.options.filter((option) => optionToRemove !== option)
-    }));
+    fetch('http://todosapi:8080/todos/'+(this.state.options.indexOf(optionToRemove) + 1), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json())
+    .then((options) => {
+      this.setState({ options: options.map(o => o.option) })
+    })
   }
 
   handleClearSelectedOption = () => {
@@ -44,19 +58,28 @@ export default class IndecisionApp extends React.Component {
       return 'This option already exists';
     }
 
-    this.setState((prevState) => ({
-      options: prevState.options.concat(option)
-    }));
+    fetch('http://todosapi:8080/todos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: (this.state.options.length + 1),
+        option: option,
+      })
+    }).then(res => res.json())
+    .then((options) => {
+      this.setState({ options: options.map(o => o.option) })
+    })
   }
 
   componentDidMount() {
     try {
-      const json = localStorage.getItem('options');
-      const options = JSON.parse(json);
-
-      if (options) {
-        this.setState(() => ({ options }));
-      }
+      fetch('http://todosapi:8080/todos')
+        .then(res => res.json())
+        .then((options) => {
+          this.setState({ options: options.map(o => o.option) })
+        })
     } catch (e) {
       // Do nothing at all
     }
@@ -64,8 +87,8 @@ export default class IndecisionApp extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.options.length !== this.state.options.length) {
-      const json = JSON.stringify(this.state.options);
-      localStorage.setItem('options', json);
+      // const json = JSON.stringify(this.state.options);
+      // localStorage.setItem('options', json);
     }
   }
 
