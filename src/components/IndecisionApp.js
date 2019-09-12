@@ -7,6 +7,7 @@ import Header from './Header';
 import OptionModal from './OptionModal';
 
 export default class IndecisionApp extends React.Component {
+  endpoint = 'http://todosapi-quarkus-marcel.apps.imperialporter.terrax.io';
 
   state = {
     options: [],
@@ -14,7 +15,7 @@ export default class IndecisionApp extends React.Component {
   }
   
   handleDeleteOptions = () => {
-    fetch('http://todosapi:8080/todos', {
+    fetch(this.endpoint + '/todos', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +27,7 @@ export default class IndecisionApp extends React.Component {
   }
 
   handleDeleteOption = (optionToRemove) => {
-    fetch('http://todosapi:8080/todos/'+(this.state.options.indexOf(optionToRemove) + 1), {
+    fetch(this.endpoint + '/todos/'+(this.state.options.indexOf(optionToRemove) + 1), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ export default class IndecisionApp extends React.Component {
       return 'This option already exists';
     }
 
-    fetch('http://todosapi:8080/todos', {
+    fetch(this.endpoint + '/todos', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ export default class IndecisionApp extends React.Component {
 
   componentDidMount() {
     try {
-      fetch('http://todosapi:8080/todos')
+      fetch(this.endpoint + '/todos')
         .then(res => res.json())
         .then((options) => {
           this.setState({ options: options.map(o => o.option) })
